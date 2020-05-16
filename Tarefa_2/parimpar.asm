@@ -23,12 +23,14 @@ _start:                             ; int main() {
     call    readint                 ;         cin >> rax;   // Le um dos 10 valores
     mov     rdi, rax                ;         rdi = rax;
     call    check_parity            ;         check_parity(&rdi, &r12, &r13);
+    inc     rbx                     ;         rbx++;
     jmp     _start.loop             ;     } while(true);
 .end:
     mov     rdi, even_msg
     call    printstr                ;     cout << even_msg;
     mov     rdi, r12
     call    printint                ;     cout << r12;         // Exibe a quantia de numeros pares
+    call    endl                    ;     cout << endl;
     mov     rdi, odd_msg
     call    printstr                ;     cout << odd_msg;
     mov     rdi, r13
