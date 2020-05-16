@@ -8,12 +8,17 @@ global _start
 
 _start:
     xor     r14, r14
+    
+    mov     r13, [max_nums]
+    mov     [input_args+1*8], r13
+
+    mov     r12, [multiple_of]
+    mov     [output_args], r12
+
 .loop_read:
-    inc     qword [input_msg_args]
-    mov     rdi, [max_nums]
-    mov     [input_msg_args+8], rdi
+    inc     qword [input_args]
     mov     rdi, input_msg
-    mov     rsi, input_msg_args
+    mov     rsi, input_args
     call    printf
     call    readint
 
@@ -21,34 +26,44 @@ _start:
     inc     r14
     cmp     r14, [max_nums]
     jl      .loop_read
+
 .loop_show:
+    test    r14, r14
+    jz      .end
     dec     r14
-    cmp     r14, 0
-    jl      .end
-    mov     rdi, [array+r14*8]
+
+    mov     rbx, [array+r14*8]
+    
+    mov     rdi, rbx
     mov     rsi, [multiple_of]
-    call    is_mul
-    jne     .loop_show
-    mov     rdi, rax
-    call    printint
+    call    restof
+    jnz     .loop_show
+
+    mov     [output_args+1*8], rbx
+    mov     rdi, output_msg
+    mov     rsi, output_args
+    call    printf
+
 .end:
     call    endl
     call    exit
 
-is_mul:
+restof:
     xor     edx, edx
     mov     rax, rdi
     div     rsi
-    mov     rax, rdi
-    cmp     edx, 0
+    test    edx, edx
     ret
 
 section .data
     max_nums:           dq  8
     multiple_of:        dq  3
-    input_msg:          db  'Informe o número %d de %d: ', 0
-    input_msg_args:     dq  1, 0
-    output_msg:         db  'Último divisível por 3 informado é: ', 0
+    
+    input_msg:          db  'Informe um número (%d/%d): ', 0
+    input_args:         dq  0, 0
+    
+    output_msg:         db  'Último divisivel por %d informado eh: %d', 0
+    output_args:        dq  0, 0
 
 section .bss
     array:  resq 8

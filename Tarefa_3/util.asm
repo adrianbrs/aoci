@@ -200,7 +200,7 @@ printf:
 
 	mov		cl, byte [rdx+1]
 	cmp		cl, 'd'
-	jne		.end
+	jne		.stype
 
 	mov		rdi, [r9]      ;     int value = *rsi
 	add		r9, 8                ;     *rsi += 8;
@@ -208,22 +208,41 @@ printf:
 	call 	itoa               ;     string str_value = to_string(value);
 	pop 	rdx                   ; Restore rdx
 
-	mov 	r10, rax              ; r10 = *itoaValue
-	mov		rdi, r10
+	mov 	r12, rax              ; r12 = *itoaValue
+	mov		rdi, r12
 	call	strlen
-	mov		r11, rax              ; r11 = str_value.length
+	mov		r13, rax              ; r13 = str_value.length
 
+.put:
 	lea		rdi, [rdx+2]
-	lea		rsi, [r11-2]
+	lea		rsi, [r13-2]
 	call	shstr
 
-	mov		rdi, r10
+	mov		rdi, r12
 	mov		rsi, rdx
 	call	cpstr
 
-	lea 	rdx, [rdx+r11-1]
+	lea 	rdx, [rdx+r13-1]
 	inc		r8                   ; Increment args counter
 	jmp 	.loop
+
+.stype:
+	mov		cl, byte [rdx+1]
+	cmp		cl, 's'
+	jne		.loop
+
+	mov		rdi, r9
+	mov		rsi, util.tmpstrval
+	call	cpstr
+
+	mov		rdi, util.tmpstrval
+	call	strlen
+	mov		r13, rax
+
+	mov		r12, util.tmpstrval
+
+	jmp		.put
+
 .end:
 	pop 	rdi
 	call	printstr
@@ -335,6 +354,7 @@ itoa:
 ;       Nithing
 ;*********************************************************************
 shstr:
+	push 	rbx
 	cmp		rsi, 0
 	jg		.shiftr
 	je		.end
@@ -350,15 +370,21 @@ shstr:
 	jmp 	.end
 
 .shiftr:
+	push 	rdi
 	call 	strlen
-	add		rax, rdi
+	pop		rdi
+	lea		rbx, [rax+rdi]
+	test 	rax, rax
+	jz		.end
 .loop_r:
-	dec		rax
-	mov 	cl, byte [rax]
-	mov		byte [rax+rsi], cl
-	cmp		cl, 0
-	jg		.loop_r
+	mov 	cl, byte [rbx]
+	mov		byte [rbx+rsi], cl
+	mov		byte[rbx], 32
+	dec		rbx
+	cmp		rbx, rdi
+	jge		.loop_r
 .end:
+	pop 	rbx
 	ret
 
 
@@ -367,4 +393,5 @@ section	.data
     util.endl   db 	10,0							; char util.endl[]="\n"
 
 section .bss
-	util.tmpstr resb 5000
+	util.tmpstr 	resb 5000
+	util.tmpstrval 	resb 5000
