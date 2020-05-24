@@ -51,7 +51,11 @@ _start:
 restof:
     xor     edx, edx
     mov     rax, rdi
-    div     rsi
+    cmp     rax, 0
+    jge     .calc
+    neg     rax
+.calc:
+    idiv    rsi
     test    edx, edx
     ret
 

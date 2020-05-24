@@ -179,74 +179,74 @@ readint:
 ;       %s: null-terminated string
 ;*********************************************************************
 printf:
-	xor 	r8, r8                ; Args counter
-	mov		r9, rsi               ; Args pointer
+		xor 	r8, r8                ; Args counter
+		mov		r9, rsi               ; Args pointer
 
-	mov		rsi, util.tmpstr
-	call	rplstr
-	mov		rdi, rsi
-	push	rdi
+		mov		rsi, util.tmpstr
+		call	rplstr
+		mov		rdi, rsi
+		push	rdi
 
-	lea     rdx, [rdi-1]
+		lea     rdx, [rdi-1]
 
 .loop:
-	inc		rdx
-    mov     cl, byte [rdx]
-    test	cl, cl
-    jz     	.end
+		inc		rdx
+		mov     cl, byte [rdx]
+		test	cl, cl
+		jz     	.end
 
-	cmp		cl, '%'
-	jne		.loop
+		cmp		cl, '%'
+		jne		.loop
 
-	mov		cl, byte [rdx+1]
-	cmp		cl, 'd'
-	jne		.stype
+		mov		cl, byte [rdx+1]
+		cmp		cl, 'd'
+		jne		.stype
 
-	mov		rdi, [r9]      ;     int value = *rsi
-	add		r9, 8                ;     *rsi += 8;
-	push	rdx                   ; Backup rdx
-	call 	itoa               ;     string str_value = to_string(value);
-	pop 	rdx                   ; Restore rdx
+		mov		rdi, [r9]      ;     int value = *rsi
+		add		r9, 8                ;     *rsi += 8;
+		push	rdx                   ; Backup rdx
+		call 	itoa               ;     string str_value = to_string(value);
+		pop 	rdx                   ; Restore rdx
 
-	mov 	r12, rax              ; r12 = *itoaValue
-	mov		rdi, r12
-	call	strlen
-	mov		r13, rax              ; r13 = str_value.length
+		mov 	r12, rax              ; r12 = *itoaValue
+		mov		rdi, r12
+		call	strlen
+		mov		r13, rax              ; r13 = str_value.length
 
 .put:
-	lea		rdi, [rdx+2]
-	lea		rsi, [r13-2]
-	call	shstr
+		lea		rdi, [rdx+2]
+		lea		rsi, [r13-2]
+		call	shstr
 
-	mov		rdi, r12
-	mov		rsi, rdx
-	call	cpstr
+		mov		rdi, r12
+		mov		rsi, rdx
+		call	cpstr
 
-	lea 	rdx, [rdx+r13-1]
-	inc		r8                   ; Increment args counter
-	jmp 	.loop
+		lea 	rdx, [rdx+r13-1]
+		inc		r8                   ; Increment args counter
+		jmp 	.loop
 
 .stype:
-	mov		cl, byte [rdx+1]
-	cmp		cl, 's'
-	jne		.loop
+		mov		cl, byte [rdx+1]
+		cmp		cl, 's'
+		jne		.loop
 
-	mov		rdi, r9
-	mov		rsi, util.tmpstrval
-	call	cpstr
+		mov		rdi, r9
+		mov		rsi, util.tmpstrval
+		call	cpstr
 
-	mov		rdi, util.tmpstrval
-	call	strlen
-	mov		r13, rax
+		mov		rdi, util.tmpstrval
+		call	strlen
+		mov		r13, rax
 
-	mov		r12, util.tmpstrval
+		mov		r12, util.tmpstrval
 
-	jmp		.put
+		jmp		.put
 
 .end:
-	pop 	rdi
-	call	printstr
-	ret
+		pop 	rdi
+		call	printstr
+		ret
 
 
 
@@ -261,20 +261,20 @@ printf:
 ;       Nothing
 ;*********************************************************************
 rplstr:
-	push rdi
-	push rsi
+		push rdi
+		push rsi
 .loop:
-	mov		cl, byte[rdi]
-	mov 	byte[rsi], cl
-	test	cl, cl
-	jz		.end
-	inc 	rdi
-	inc		rsi
-	jmp 	.loop
+		mov		cl, byte[rdi]
+		mov 	byte[rsi], cl
+		test	cl, cl
+		jz		.end
+		inc 	rdi
+		inc		rsi
+		jmp 	.loop
 .end:
-	pop		rsi
-	pop		rdi
-	ret
+		pop		rsi
+		pop		rdi
+		ret
 
 
 ;*********************************************************************
@@ -288,20 +288,20 @@ rplstr:
 ;       Nothing
 ;*********************************************************************
 cpstr:
-	push rdi
-	push rsi
+		push rdi
+		push rsi
 .loop:
-	mov		cl, byte[rdi]
-	test	cl, cl
-	jz		.end
-	mov 	byte[rsi], cl
-	inc 	rdi
-	inc		rsi
-	jmp 	.loop
+		mov		cl, byte[rdi]
+		test	cl, cl
+		jz		.end
+		mov 	byte[rsi], cl
+		inc 	rdi
+		inc		rsi
+		jmp 	.loop
 .end:
-	pop		rsi
-	pop		rdi
-	ret
+		pop		rsi
+		pop		rdi
+		ret
 
 
 
@@ -318,7 +318,7 @@ itoa:
 		mov		rax, rdi			; rax = n	
 		xor 	rcx, rcx			; is_neg = false
 		cmp 	rax, 0				;
-		jge		itoa.nn  		; if(n<0)	  
+		jge		itoa.nn  			; if(n<0)	  
 		not 	rcx					; 		is_neg = true
 		neg 	rax					;     	n = -n
 .nn:	
@@ -331,10 +331,10 @@ itoa:
 		mov 	byte [rdi], dl		;		*p = digit in dl
 		dec 	rdi					; 		p--
 		cmp 	rax, 0				; 
-		jg 		itoa.loop		; }while (n>0)
+		jg 		itoa.loop			; }while (n>0)
 
 		test 	rcx, rcx			; if(is_neg)
-		jz		itoa.notneg	;   	// Prepend minus sign	
+		jz		itoa.notneg			; // Prepend minus sign	
 		mov 	byte [rdi], '-'		; 		*p = '-'
 		dec 	rdi					;		p--
 .notneg:		
@@ -351,41 +351,41 @@ itoa:
 ; Arguments: 
 ;		rdi: The length to be shifted (use negative to shift left)
 ; Returns:
-;       Nithing
+;       Nothing
 ;*********************************************************************
 shstr:
-	push 	rbx
-	cmp		rsi, 0
-	jg		.shiftr
-	je		.end
+		push 	rbx					; // Callee saved
+		cmp		rsi, 0              ;  
+		jg		.shiftr				; if(rsi < 0) {
+		je		.end
+									; 	// Shift left (rsi is negative)
+.loop_l:							; 	do {
+		mov 	cl, byte [rdi]		; 		char cl = *rdi
+		mov		rax, rdi			; 		char *rax = rdi
+		add		rax, rsi			;		rax += rsi
+		mov		byte [rax], cl		;		*rax = cl
+		inc 	rdi					;		rdi++
+		test	cl, cl
+		jnz		.loop_l				; 	} while(cl != 0)
+		jmp 	.end				;
 
-.loop_l:
-	mov 	cl, byte [rdi]
-	mov		rax, rdi
-	add		rax, rsi
-	mov		byte [rax], cl
-	inc 	rdi
-	cmp		cl, 0
-	jg		.loop_l
-	jmp 	.end
-
-.shiftr:
-	push 	rdi
-	call 	strlen
-	pop		rdi
-	lea		rbx, [rax+rdi]
-	test 	rax, rax
-	jz		.end
-.loop_r:
-	mov 	cl, byte [rbx]
-	mov		byte [rbx+rsi], cl
-	mov		byte[rbx], 32
-	dec		rbx
-	cmp		rbx, rdi
-	jge		.loop_r
-.end:
-	pop 	rbx
-	ret
+.shiftr:							; } else if(rsi > 0) {
+		push 	rdi					; 	// Shift right (rsi is positive)
+		call 	strlen				; 	size_t input_length = strlen(rdi)
+		pop		rdi
+		test	rax, rax
+		jz		.end 				; 	if(input_length > 0) {
+		lea		rbx, [rdi+rax]		; 		char *rbx = rdi+input_length
+.loop_r:							;		do {
+		mov 	cl, byte [rbx]		;			char cl = *rbx
+		mov		byte [rbx+rsi], cl	;			char *c = rbx; c += rsi; *c = cl
+		mov		byte[rbx], 32		;			*rbx = " "
+		dec		rbx					;			rbx--
+		cmp		rbx, rdi
+		jge		.loop_r				;		} while(rbx >= rdi)
+.end:								; 	}
+		pop 	rbx                 ; 	// Callee saved
+		ret 						; }
 
 
 section	.data
@@ -393,5 +393,5 @@ section	.data
     util.endl   db 	10,0							; char util.endl[]="\n"
 
 section .bss
-	util.tmpstr 	resb 5000
-	util.tmpstrval 	resb 5000
+	util.tmpstr 	resb 10000                      ; char util.tmpstr[10000]
+	util.tmpstrval 	resb 10000                      ; char util.tmpstrval[10000]
